@@ -1,17 +1,17 @@
 /* Letho, królobójca, by KSP. */
 
-:- dynamic obecna_lokalizacja/1, holding/1, finished/1, przedmioty_lokalizacje/2, potwory_lokalizacje/3, ostrzezenie/1.
+:- dynamic obecna_lokalizacja/1, posiadasz/1, finished/1, przedmioty_lokalizacje/2, potwory_lokalizacje/3, ostrzezenie/1, pomoc/1.
 :- discontiguous(dostepne_lokacje/2).
-:- assertz(ostrzezenie(0)).
 
 %%%%%% Connections Graph %%%%%
 % starting point
-obecna_lokalizacja(brzeg_rzeki).
+obecna_lokalizacja(ogrody).
 
 /* Brzeg rzeki */
 dostepne_lokacje(brzeg_rzeki, kanaly).
 dostepne_lokacje(brzeg_rzeki, szopa).
 dostepne_lokacje(brzeg_rzeki, lodka).
+:- assertz(ostrzezenie(0)).
 
 /* Łódka */
 dostepne_lokacje(lodka, brzeg_rzeki).
@@ -35,40 +35,33 @@ dostepne_lokacje(stol_rzemieslniczy, szopa).
 /* Kanały */
 
 dostepne_lokacje(kanaly, drzwi_prowadzace_na_przedmiescia).
-:- assertz(potwory_lokalizacje(kanaly, utopiec, 4)).
+:- assertz(potwory_lokalizacje(kanaly, utopiec, 4, mozg_utopca)).
 dostepne_lokacje(kanaly, miejsce_mocy).
-:- assertz(potwory_lokalizacje(miejsce_mocy, baba_wodna, 6)).
+:- assertz(potwory_lokalizacje(miejsce_mocy, baba_wodna, 6, aard)).
 dostepne_lokacje(miejsce_mocy, kanaly).
-:- assertz(przedmioty_lokalizacje(aard, miejsce_mocy)).
 dostepne_lokacje(drzwi_prowadzace_na_przedmiescia, kanaly).
-dostepne_lokacje(drzwi_prowadzace_na_przedmiescia, przedmiescia).
 
 
 /* Przedmieścia */
 dostepne_lokacje(przedmiescia, handlarz).
-dostepne_lokacje(przedmiescia, dom_handlarza). %:- rozmawial(handlarz).
+dostepne_lokacje(przedmiescia, dom_handlarza).
 dostepne_lokacje(przedmiescia, ogrody).
 dostepne_lokacje(przedmiescia, zamek). %death or back
 
 /* Handlarz */
 dostepne_lokacje(handlarz, przedmiescia).
+:- assertz(handlarz(0)).
+
 
 /* Dom Handlarza */
 dostepne_lokacje(dom_handlarza, przedmiescia).
-dostepne_lokacje(dom_handlarza, szafa).
-dostepne_lokacje(dom_handlarza, kufer).
-dostepne_lokacje(dom_handlarza, biurko).
-dostepne_lokacje(dom_handlarza, strych).
-dostepne_lokacje(szafa, dom_handlarza).
-dostepne_lokacje(kufer, dom_handlarza).
-dostepne_lokacje(biurko, dom_handlarza).
-dostepne_lokacje(strych, dom_handlarza).
-
 
 /* Ogrody */
-dostepne_lokacje(ogrody, zamek).
 dostepne_lokacje(ogrody, rabatka).
+dostepne_lokacje(ogrody, ognisko).
 dostepne_lokacje(rabatka, ogrody).
+dostepne_lokacje(ognisko, ogrody).
+:- assertz(przedmioty_lokalizacje(jaskolcze_ziele, rabatka)).
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % AKT2
@@ -107,9 +100,25 @@ opis(skrzynia)                                 :- write('Przeczesując rozmaite 
 opis(stol_rzemieslniczy)                       :- write('Na stole leżą wielkie zardzewiałe obcęgi oraz łom, mający swoje najlepsze lata już dawno za sobą.'), nl.
 /* Akt 1 Kanały */
 opis(drzwi_prowadzace_na_przedmiescia)         :- write('Stoją przed Tobą wrota prowadzące na przedmieścia Remisu. Próbujesz je otworzyć, ale potężne metalowe zawiasy trzymają je w ryzach. Może spróbuj czegoś innego...'), nl.
-opis(miejsce_mocy)                             :- write('Już miałeś zaczerpnąć energii z miejsca mocy, gdy z odmętów wodnych nieopodal wynurzyła się ociekająca szlamem baba wodna.'), nl.
+opis(miejsce_mocy)                             :- write('Twój medalion drży. Już miałeś zaczerpnąć energii z miejsca mocy, gdy z odmętów wodnych nieopodal wynurzyła się ociekająca szlamem baba wodna.'), nl.
 /* Akt 2 Miasto */
-opis(przedmiescia)                             :- write('SS.'), nl.
+opis(przedmiescia)                             :- write('Przed Twoimi oczami rysują się pełne gwaru i chaosu przedmieścia Remisu. Biegający w popłochu mieszkańcy próbują dostać się do twierdzy zamku poszukując schronienia.\nW tej chmarze ploretariatu udaje Ci się dostrzec wyróżniające się ogniwo. Jest to kupiec próbujący przedrzeć się przez drzwi domu.\nCiężko będzie odnaleźć w tym zamieszaniu Foltesta, przydałoby się jakoś przeniknąć niepostrzeżenie do twierdzy i za wczasu przygotować się do zasadzki.\nW oddali zauważasz również ogrody księżnej.'), nl.
+opis(handlarz)                                 :- 
+        handlarz(0) -> retract(handlarz(0)), assertz(handlarz(1)), write('Pomocy wiedźminie! W moim domu uwięziona jest córka! Szafa zablokowała drzwi od środka po uderzeniu głazu w dom sąsiada, który cisnięty został przez katapulty Foltesta.\nNa tyłach domu jest jeszcze jedno wejście, pijani maruderzy próbują się dostać do mojej Hanusi. Pośpiesz się prędko!'), nl, !;
+        handlarz(1), not(posiadasz(hanusia)) -> retract(handlarz(1)), assertz(handlarz(3)),assertz(potwory_lokalizacje(handlarz, handlarz, 1, biala_mewa)), write('Wiedźminie! Dlaczego pozwoliłeś mojej Hanusi zginąć?!.'), nl, potwory_w_poblizu(handlarz), !;
+        handlarz(2), not(posiadasz(hanusia)) -> retract(handlarz(2)), assertz(handlarz(3)),assertz(potwory_lokalizacje(handlarz, handlarz, 1, biala_mewa)), retract(przedmioty_lokalizacje(hanusia, dom_handlarza)), write('Wiedźminie! Dlaczego pozwoliłeś mojej Hanusi zginąć?!.'), nl, potwory_w_poblizu(handlarz), !;
+        handlarz(2), posiadasz(hanusia) -> retract(handlarz(2)), assertz(handlarz(3)), assertz(przedmioty_lokalizacje(biala_mewa, handlarz)),write('Wiedźminie! Dzięki Ci po stokroć! Proszę, słyszałem, że to bezcenny alkohol do warzenia eliksirów. Może Ci się przyda.'), nl, assertz(pomoc(1)), !;
+        write('Nic Tu po Tobie! Lepiej się pośpiesz!'), nl.
+
+opis(dom_handlarza)                            :-
+        handlarz(1) -> write('Drzwi do domu są otwarte na ościerz, a ze środka dobiegają krzyki młodej dziewczyny. Jeśli chcesz coś zrobić lepiej zrób to teraz!'), nl, assertz(potwory_lokalizacje(dom_handlarza, maruderzy, 5, hanusia)),retract(handlarz(1)), assertz(handlarz(2)), !;
+        write('Nic Tu po Tobie! Lepiej się pośpiesz!'), nl.
+opis(ogrody)                                   :- write('Woń kwiatów pozwala Ci zapomnieć na chwilę, że miasto znajduje się pod szturmem armi Foltesta. Jedna z kwiatowych rabat pobudza Twój medalion do drgania.\nO ścianę zamku rozbił się płonący pocisk katapult, z odłamków możnaby utworzyć ognisko. A w samej ścianie dostrzegasz szczelinę, którą z pewnością mógłbyś się przecisnąć.'), nl.
+opis(ognisko)                                  :- write('Płomień tańczy wysoko ogrzewając okolicę. Gdyby był tu Vesemir na pewno przypomniałby Ci nie jeden wykład z alchemii.\nMożnaby spróbować wytworzyć jakąś mikstruę, która ułatwiłaby Ci przedostanie się za mury zamku.'), nl.
+opis(rabatka)                                  :- write('Między ozdobnymi kwiatami dostrzegasz kilka Jaskółczych Ziel.'), nl.
+/* Akt 3 Zamek */
+opis(zamek)                                    :- write('XD.'), nl.
+
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 /* These rules describe how to pick up an object. */
@@ -117,8 +126,8 @@ opis(przedmiescia)                             :- write('SS.'), nl.
 wez(X) :-
         obecna_lokalizacja(Place),
         przedmioty_lokalizacje(X, Place),
-        not(holding(X)),
-        assertz(holding(X)),
+        not(posiadasz(X)),
+        assertz(posiadasz(X)),
         retract(przedmioty_lokalizacje(X, Place)),
         write('Chowasz '),
         write(X),
@@ -135,7 +144,7 @@ wez(_) :-
 
 uzyj(klucz) :-
         obecna_lokalizacja(drzwi_prowadzace_na_przedmiescia),
-        holding(klucz),
+        posiadasz(klucz),
         write('Włożyłeś klucz do zamka i z nadzieją spróbowałeś przekręcić go w dziurce. Ku twojemu zaskoczeniu pasował jak ulał!'),
         nl,
         write('Wielkie wrota stanęły przed Tobą otworem, wybiegasz na przedmieścia, czując oddech zbliżających się żołnierzy Foltesta na plecach.'),
@@ -146,7 +155,7 @@ uzyj(klucz) :-
 
 uzyj(lom) :-
         obecna_lokalizacja(drzwi_prowadzace_na_przedmiescia),
-        holding(lom),
+        posiadasz(lom),
         write('Wsunąłeś zardzewiały łom między dzwi, a futrynę. Z całych sił próbujesz pokonać nieugiętego przeciewnika.'),
         nl,
         write('Niestety łom pęka, a Ty wpadasz po szyję w ściekowy szlam. Ledwie zdąrzyłeś się w pełni wynużyć na brzeg, a kolejne utopce przyszły złożyć Ci wizytę...'),
@@ -157,35 +166,69 @@ uzyj(lom) :-
 
 uzyj(klucz) :-
         obecna_lokalizacja(drzwi_prowadzace_na_przedmiescia),
-        holding(klucz),
+        posiadasz(klucz),
         write('Włożyłeś klucz do zamka i z nadzieją spróbowałeś przekręcić go w dziurce. Ku twojemu zaskoczeniu pasował jak ulał!'),
         nl,
         write('Wielkie wrota stanęły przed Tobą otworem, wybiegasz na przedmieścia, czując oddech zbliżających się żołnierzy Foltesta na plecach.'),
         nl,
         zostaw(klucz),
-        !,
-        idz(przedmiescia).
+        retract(obecna_lokalizacja(drzwi_prowadzace_na_przedmiescia)),
+        assertz(obecna_lokalizacja(przedmiescia)),
+        rozejrzyj_sie,
+        !.
 
 uzyj(aard) :-
         obecna_lokalizacja(drzwi_prowadzace_na_przedmiescia),
-        holding(aard),
+        posiadasz(aard),
         write('Zebrałeś w sobie wewnętrzną siłę i przy użyciu wiedźmińskiego znaku Aard udało Ci się roztrzaskać drzwi na strzępy!'),
         nl,
         write('Wybiegasz na przedmieścia, obtrzepujesz się z pozostałych jeszcze drzazg i kurzu, czując oddech zbliżających się żołnierzy Foltesta na plecach.'),
         nl,
         zostaw(aard),
-        !,
-        idz(przedmiescia).
+        retract(obecna_lokalizacja(drzwi_prowadzace_na_przedmiescia)),
+        assertz(obecna_lokalizacja(przedmiescia)),
+        rozejrzyj_sie,
+        !.
+
+uzyj(dekokt_raffarda_bialego) :-
+        obecna_lokalizacja(ogrody),
+        posiadasz(dekokt_raffarda_bialego),
+        write('Wypijasz Dekokt Raffarda Bialego i natychmiast przemieniasz się w piękną opiekunkę dzieci Foltesta. Niepostrzeżenie przechodzisz przez otwór w ścianie i przedostajesz się do zamku.'),
+        nl,
+        zostaw(dekokt_raffarda_bialego),
+        retract(obecna_lokalizacja(ogrody)),
+        assertz(obecna_lokalizacja(zamek)),
+        rozejrzyj_sie,
+        !.
 
 uzyj(_) :-
         write('Nie masz pomysłu jak użyć tutaj tego przedmiotu.'),
         nl.
 
+uzyj(biala_mewa, jaskolcze_ziele, mozg_utopca) :-
+        obecna_lokalizacja(ognisko),
+        posiadasz(biala_mewa),
+        posiadasz(jaskolcze_ziele),
+        posiadasz(mozg_utopca),
+        write('Nareszcie udało Ci się przypomnieć sobie odpowiednią kombinację składników! Eliksir jest już gotowy!'),
+        nl,
+        assertz(przedmioty_lokalizacje(dekokt_raffarda_bialego, ognisko)),
+        wez(dekokt_raffarda_bialego),
+        nl,
+        zostaw(biala_mewa),
+        zostaw(jaskolcze_ziele),
+        zostaw(mozg_utopca),
+        !.
+
+uzyj(_, _, _) :-
+        write('Nie, to nie tak...'),
+        nl.
+
 /* These rules describe how to put down an object. */
 zostaw(X) :-
         obecna_lokalizacja(Place),
-        holding(X),
-        retract(holding(X)),
+        posiadasz(X),
+        retract(posiadasz(X)),
         assertz(przedmioty_lokalizacje(X, Place)),
         write('Upuszczono: '),
         write(X),
@@ -206,7 +249,7 @@ destynacje(_).
 /* This rule tells how to move in a given direction. */
 idz(_) :-
         obecna_lokalizacja(Here),
-        potwory_lokalizacje(Here, _, _),
+        potwory_lokalizacje(Here, _, _, _),
         write('No chyba cie pojebalo.'),
         !.
 
@@ -221,13 +264,13 @@ idz(_) :-
         write('Nie możesz tam pójść z tego miejsca.'),
         fail.
 
-/* This rule lists out what you are holding. */
+/* This rule lists out what you are posiadasz. */
 trzymasz :-
         write('Trzymasz:'), nl,
         trzymasz.
 
 trzymasz_lista :-
-        holding(X),
+        posiadasz(X),
         write('-'), write(X), nl,
         fail.
 trzymasz_lista.
@@ -255,14 +298,14 @@ przedmioty_w_poblizu(Place) :-
 przedmioty_w_poblizu(_).
 
 potwory_w_poblizu(Place) :-
-        potwory_lokalizacje(Place, X, _),
+        potwory_lokalizacje(Place, X, _, _),
         write('Twoim przeciwnikiem jest: '), write(X), write('.'), nl, fail.
 
 potwory_w_poblizu(_).
 
 atakuj :-
         obecna_lokalizacja(Place),
-        potwory_lokalizacje(Place, X, Y),
+        potwory_lokalizacje(Place, X, Y, _),
         random(2, 12, Z),
         write('Wylosowałeś: '),
         write(Z),
@@ -276,7 +319,10 @@ wynik_walki(Z, Y, X, Place) :-
         write(X),
         write('!'),
         nl,
-        retract(potwory_lokalizacje(Place, _, _)).
+        retract(potwory_lokalizacje(Place, _, _, Item)),
+        assertz(przedmioty_lokalizacje(Item, Place)),
+        nl,
+        przedmioty_w_poblizu(Place).
 
 wynik_walki(Z, Y, X) :-
         Z =< Y,
