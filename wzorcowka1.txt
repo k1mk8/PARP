@@ -1,0 +1,306 @@
+1 ?- [letho].
+true.
+
+2 ?- start.
+
+Komendy wpisuj przy użyciu standardowej składni Prologa.
+Większość komend ma swoje skróty.
+Np. r[ozejrzyj_sie]. oznacza, że wystarczy wpisać "r.", aby wykonać "rozejrzyj_sie."
+Dostępne komendy to:
+start.               -- aby rozpocząć grę.
+i[dz](Miejsce)       -- aby pójść do tego miejsca.
+w[ez](obiekt).       -- aby podnieść ten obiekt.
+u[zyj](obiekt).      -- aby użyć tego obiektu.
+z[ostaw](obiekt).    -- aby odłożyć ten obiekt.
+t[rzymasz_lista].    -- aby wypisać przedmioty, które się trzyma.
+r[ozejrzyj_sie].     -- aby rozejrzeć się dookoła.
+d[estynacje].        -- aby zobaczyć, gdzie możesz się dostać z miejsca, w którym jesteś.
+k[omendy].           -- aby ponownie zobaczyć listę dostępnych komend.
+z[astaw_pulapke].    -- aby zastawić pułapke (dostępne tylko w zamku).
+halt.                -- aby zakończyć grę i z niej wyjść.
+
+Nareszcie dotarłeś do przedmieści Remisu, gdzie masz nadzieję zgładzić tyrana Foltesta.
+Niestety podróż zajęła dłużej niż oczekiwałeś, a wymarsz armii króla nastąpi za około 25 minut.
+Wykorzystaj ten czas mądrze i przygotuj się najlepiej jak potrafisz. Jesteś wiedźminem, sam powinieneś wiedzieć najlepiej czego Ci potrzeba!
+
+Stoisz na brzegu rzeki przy łódce którą przypłynąłeś, w oddali widzisz zejście do kanałów oraz starą szopę nieopodal.
+
+Dostępne lokacje z brzeg_rzeki:
+kanaly
+szopa
+lodka
+
+
+true.
+
+3 ?- i(szopa).
+
+Poczułeś zapach zatęchłego, dawno zapomnianego warsztatu. Twoim oczom ukazuje się stara drewniana skrzynia oraz stół rzemieślniczy z zardzewiałymi narzędziami.
+
+Dostępne lokacje z szopa:
+brzeg_rzeki
+skrzynia
+stol_rzemieslniczy
+
+
+true.
+
+4 ?- i(skrzynia).
+
+Przeczesując rozmaite rupiecie w skrzyni zauważasz coś ciekawego... To klucz, być może przy odrobinie szczęścia uda Ci się znaleźć pasujący do niego zamek!
+
+Dostępne lokacje z skrzynia:
+szopa
+
+Jest tutaj: klucz.
+
+true.
+
+5 ?- w(klucz).
+Chowasz klucz do ekwipunku.
+true.
+
+6 ?- i(szopa).
+
+Żołnierze króla nadchodzą! Brzeg zaraz zostanie odcięty!
+
+Dostępne lokacje z szopa:
+brzeg_rzeki
+skrzynia
+stol_rzemieslniczy
+
+
+true.
+
+7 ?- i(brzeg_rzeki).
+
+Stoisz na brzegu rzeki przy łódce którą przypłynąłeś, w oddali widzisz zejście do kanałów oraz starą szopę nieopodal.
+
+Dostępne lokacje z brzeg_rzeki:
+kanaly
+szopa
+lodka
+
+
+true.
+
+8 ?- i(kanaly).
+
+Stoisz po pas w ściekach Remisu. Słyszysz jak grupa utopców biegnie w Twoją stronę, co robisz?!
+
+Dostępne lokacje z kanaly:
+drzwi_prowadzace_na_przedmiescia
+miejsce_mocy
+
+Twoim przeciwnikiem jest: utopiec.
+
+true.
+
+9 ?- a.
+Wylosowałeś: 11.
+Wygrałeś walkę z: utopiec!
+
+Jest tutaj: mozg_utopca.
+true.
+
+10 ?- w(mozg_utopca).
+Chowasz mozg_utopca do ekwipunku.
+true.
+
+11 ?- i(drzwi_prowadzace_na_przedmiescia).
+
+Stoją przed Tobą wrota prowadzące na przedmieścia Remisu. Próbujesz je otworzyć, ale potężne metalowe zawiasy trzymają je w ryzach. Może spróbuj czegoś innego...
+
+Dostępne lokacje z drzwi_prowadzace_na_przedmiescia:
+kanaly
+
+
+true.
+
+12 ?- u(klucz).
+Włożyłeś klucz do zamka i z nadzieją spróbowałeś przekręcić go w dziurce. Ku twojemu zaskoczeniu pasował jak ulał!
+Wielkie wrota stanęły przed Tobą otworem, wybiegasz na przedmieścia, czując oddech zbliżających się żołnierzy Foltesta na plecach.
+Upuszczono: klucz.
+
+Przed Twoimi oczami rysują się pełne gwaru i chaosu przedmieścia Remisu. Biegający w popłochu mieszkańcy próbują dostać się do twierdzy zamku poszukując schronienia.
+W tej chmarze ploretariatu udaje Ci się dostrzec wyróżniające się ogniwo. Jest to kupiec próbujący przedrzeć się przez drzwi domu.
+Ciężko będzie odnaleźć w tym zamieszaniu Foltesta, przydałoby się jakoś przeniknąć niepostrzeżenie do twierdzy i za wczasu przygotować się do zasadzki.
+W oddali zauważasz również ogrody księżnej.
+
+Dostępne lokacje z przedmiescia:
+handlarz
+dom_handlarza
+ogrody
+
+
+true.
+
+13 ?- i(handlarz).
+
+Pomocy wiedźminie! W moim domu uwięziona jest córka! Szafa zablokowała drzwi od środka po uderzeniu głazu w dom sąsiada, który cisnięty został przez katapulty Foltesta.
+Na tyłach domu jest jeszcze jedno wejście, pijani maruderzy próbują się dostać do mojej Hanusi. Pośpiesz się prędko!
+
+Dostępne lokacje z handlarz:
+przedmiescia
+
+
+true.
+
+14 ?- i(przedmiescia).
+
+Przed Twoimi oczami rysują się pełne gwaru i chaosu przedmieścia Remisu. Biegający w popłochu mieszkańcy próbują dostać się do twierdzy zamku poszukując schronienia.
+W tej chmarze ploretariatu udaje Ci się dostrzec wyróżniające się ogniwo. Jest to kupiec próbujący przedrzeć się przez drzwi domu.
+Ciężko będzie odnaleźć w tym zamieszaniu Foltesta, przydałoby się jakoś przeniknąć niepostrzeżenie do twierdzy i za wczasu przygotować się do zasadzki.
+W oddali zauważasz również ogrody księżnej.
+
+Dostępne lokacje z przedmiescia:
+handlarz
+dom_handlarza
+ogrody
+
+
+true.
+
+15 ?- i(handlarz).
+
+Wiedźminie! Dlaczego pozwoliłeś mojej Hanusi zginąć?!.
+Twoim przeciwnikiem jest: handlarz.
+
+Dostępne lokacje z handlarz:
+przedmiescia
+
+Twoim przeciwnikiem jest: handlarz.
+
+true.
+
+16 ?- a.
+Wylosowałeś: 7.
+Wygrałeś walkę z: handlarz!
+
+Jest tutaj: biala_mewa.
+true.
+
+17 ?- w(biala_mewa).
+Chowasz biala_mewa do ekwipunku.
+true.
+
+18 ?- i(przedmiescia).
+
+Przed Twoimi oczami rysują się pełne gwaru i chaosu przedmieścia Remisu. Biegający w popłochu mieszkańcy próbują dostać się do twierdzy zamku poszukując schronienia.
+W tej chmarze ploretariatu udaje Ci się dostrzec wyróżniające się ogniwo. Jest to kupiec próbujący przedrzeć się przez drzwi domu.
+Ciężko będzie odnaleźć w tym zamieszaniu Foltesta, przydałoby się jakoś przeniknąć niepostrzeżenie do twierdzy i za wczasu przygotować się do zasadzki.
+W oddali zauważasz również ogrody księżnej.
+
+Dostępne lokacje z przedmiescia:
+handlarz
+dom_handlarza
+ogrody
+
+
+true.
+
+19 ?- i(ogrody).
+
+Woń kwiatów pozwala Ci zapomnieć na chwilę, że miasto znajduje się pod szturmem armi Foltesta. Jedna z kwiatowych rabat pobudza Twój medalion do drgania.
+O ścianę zamku rozbił się płonący pocisk katapult, z odłamków możnaby utworzyć ognisko. A w samej ścianie dostrzegasz szczelinę, którą z pewnością mógłbyś się przecisnąć.
+
+Dostępne lokacje z ogrody:
+rabatka
+ognisko
+przedmiescia
+
+
+true.
+
+20 ?- i(rabatka).
+
+Między ozdobnymi kwiatami dostrzegasz kilka Jaskółczych Ziel.
+
+Dostępne lokacje z rabatka:
+ogrody
+
+Jest tutaj: jaskolcze_ziele.
+
+true.
+
+21 ?- w(jaskolcze_ziele).
+Chowasz jaskolcze_ziele do ekwipunku.
+true.
+
+22 ?- i(ogrody).
+
+Woń kwiatów pozwala Ci zapomnieć na chwilę, że miasto znajduje się pod szturmem armi Foltesta. Jedna z kwiatowych rabat pobudza Twój medalion do drgania.
+O ścianę zamku rozbił się płonący pocisk katapult, z odłamków możnaby utworzyć ognisko. A w samej ścianie dostrzegasz szczelinę, którą z pewnością mógłbyś się przecisnąć.
+
+Dostępne lokacje z ogrody:
+rabatka
+ognisko
+przedmiescia
+
+
+true.
+
+23 ?- i(ognisko).
+
+Płomień tańczy wysoko ogrzewając okolicę. Gdyby był tu Vesemir na pewno przypomniałby Ci nie jeden wykład z alchemii.
+Możnaby spróbować wytworzyć jakąś miksturę, która ułatwiłaby Ci przedostanie się za mury zamku.
+
+Dostępne lokacje z ognisko:
+ogrody
+
+
+true.
+
+24 ?- u(biala_mewa, jaskolcze_ziele, mozg_utopca).
+Nareszcie udało Ci się przypomnieć sobie odpowiednią kombinację składników! Eliksir jest już gotowy!
+Chowasz dekokt_raffarda_bialego do ekwipunku.
+
+Upuszczono: biala_mewa.
+Upuszczono: jaskolcze_ziele.
+Upuszczono: mozg_utopca.
+true.
+
+25 ?- i(ogrody).
+
+Woń kwiatów pozwala Ci zapomnieć na chwilę, że miasto znajduje się pod szturmem armi Foltesta. Jedna z kwiatowych rabat pobudza Twój medalion do drgania.
+O ścianę zamku rozbił się płonący pocisk katapult, z odłamków możnaby utworzyć ognisko. A w samej ścianie dostrzegasz szczelinę, którą z pewnością mógłbyś się przecisnąć.
+
+Dostępne lokacje z ogrody:
+rabatka
+ognisko
+przedmiescia
+
+
+true.
+
+26 ?- u(dekokt_raffarda_bialego).
+Wypijasz Dekokt Raffarda Bialego i natychmiast przemieniasz się w piękną opiekunkę dzieci Foltesta. Niepostrzeżenie przechodzisz przez otwór w ścianie i przedostajesz się do zamku.
+Upuszczono: dekokt_raffarda_bialego.
+
+Wchodzisz w bezkres sal i korytarzy potężnego zamku. Rozglądasz się w każdą stronę, w poszukiwaniu pokoju Twoich podopiecznych.
+Potrzebujesz informacji na temat miejsca, w którym najcześciej pojawia się Foltest.
+
+Dostępne lokacje z zamek:
+balkon
+pokoj_dzieci
+salon
+korytarz
+straznica
+
+
+true.
+
+27 ?- i(balkon).
+
+Panorama miasta maluje się pod Twoimi stopami, a powiew świeżego wiatru muska blizny na Twojej twarzy.
+Wydaje Ci się, że to dobre miejsce na zakończenie żywota Twojego celu.
+
+
+Dostępne lokacje z balkon:
+zamek
+
+
+true.
+
+28 ?- z.
+Gratulacje, Foltest nie żyje, a Ty liczysz browary, które możesz kupić za pieniądze z nagrody.
