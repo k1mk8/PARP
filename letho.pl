@@ -1,11 +1,11 @@
-/* Letho, królobójca, by KSP. */
+/* Letho, królobójca, Dyszewski Szymon, Kasperek Karol, Kosmala Piotr. */
 
 :- dynamic obecna_lokalizacja/1, posiadasz/1, finished/1, przedmioty_lokalizacje/2, potwory_lokalizacje/3, ostrzezenie/1, pomoc/1.
 :- discontiguous(dostepne_lokacje/2).
 
-%%%%%% Connections Graph %%%%%
-% starting point
-obecna_lokalizacja(ogrody).
+%%%%%% Graf połączeń %%%%%
+% lokalizacja startowa 
+obecna_lokalizacja(brzeg_rzeki).
 
 /* Brzeg rzeki */
 dostepne_lokacje(brzeg_rzeki, kanaly).
@@ -46,7 +46,7 @@ dostepne_lokacje(drzwi_prowadzace_na_przedmiescia, kanaly).
 dostepne_lokacje(przedmiescia, handlarz).
 dostepne_lokacje(przedmiescia, dom_handlarza).
 dostepne_lokacje(przedmiescia, ogrody).
-dostepne_lokacje(przedmiescia, zamek). %death or back
+%dostepne_lokacje(przedmiescia, zamek). %death or back
 
 /* Handlarz */
 dostepne_lokacje(handlarz, przedmiescia).
@@ -61,6 +61,7 @@ dostepne_lokacje(ogrody, rabatka).
 dostepne_lokacje(ogrody, ognisko).
 dostepne_lokacje(rabatka, ogrody).
 dostepne_lokacje(ognisko, ogrody).
+dostepne_lokacje(ogrody, przedmiescia).
 :- assertz(przedmioty_lokalizacje(jaskolcze_ziele, rabatka)).
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -79,9 +80,8 @@ dostepne_lokacje(korytarz, zamek).
 dostepne_lokacje(straznica, zamek).
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-%%%%% Locations descriptions %%%%%
-/* These rules describe the various rooms.
- * Depending on circumstances, a room may have more than one description. */
+%%%%% Opis lokacji %%%%%
+/* Każda lokacja ma swój własny opis, zależny od stanu gry */
 
 /* Akt 0 Prolog */
 opis(brzeg_rzeki)                              :- write('Stoisz na brzegu rzeki przy łódce którą przypłynąłeś, w oddali widzisz zejście do kanałów oraz starą szopę nieopodal.'), nl.
@@ -104,25 +104,27 @@ opis(miejsce_mocy)                             :- write('Twój medalion drży. J
 /* Akt 2 Miasto */
 opis(przedmiescia)                             :- write('Przed Twoimi oczami rysują się pełne gwaru i chaosu przedmieścia Remisu. Biegający w popłochu mieszkańcy próbują dostać się do twierdzy zamku poszukując schronienia.\nW tej chmarze ploretariatu udaje Ci się dostrzec wyróżniające się ogniwo. Jest to kupiec próbujący przedrzeć się przez drzwi domu.\nCiężko będzie odnaleźć w tym zamieszaniu Foltesta, przydałoby się jakoś przeniknąć niepostrzeżenie do twierdzy i za wczasu przygotować się do zasadzki.\nW oddali zauważasz również ogrody księżnej.'), nl.
 opis(handlarz)                                 :- 
-        handlarz(0) -> retract(handlarz(0)), assertz(handlarz(1)), write('Pomocy wiedźminie! W moim domu uwięziona jest córka! Szafa zablokowała drzwi od środka po uderzeniu głazu w dom sąsiada, który cisnięty został przez katapulty Foltesta.\nNa tyłach domu jest jeszcze jedno wejście, pijani maruderzy próbują się dostać do mojej Hanusi. Pośpiesz się prędko!'), nl, !;
-        handlarz(1), not(posiadasz(hanusia)) -> retract(handlarz(1)), assertz(handlarz(3)),assertz(potwory_lokalizacje(handlarz, handlarz, 1, biala_mewa)), write('Wiedźminie! Dlaczego pozwoliłeś mojej Hanusi zginąć?!.'), nl, potwory_w_poblizu(handlarz), !;
-        handlarz(2), not(posiadasz(hanusia)) -> retract(handlarz(2)), assertz(handlarz(3)),assertz(potwory_lokalizacje(handlarz, handlarz, 1, biala_mewa)), retract(przedmioty_lokalizacje(hanusia, dom_handlarza)), write('Wiedźminie! Dlaczego pozwoliłeś mojej Hanusi zginąć?!.'), nl, potwory_w_poblizu(handlarz), !;
-        handlarz(2), posiadasz(hanusia) -> retract(handlarz(2)), assertz(handlarz(3)), assertz(przedmioty_lokalizacje(biala_mewa, handlarz)),write('Wiedźminie! Dzięki Ci po stokroć! Proszę, słyszałem, że to bezcenny alkohol do warzenia eliksirów. Może Ci się przyda.'), nl, assertz(pomoc(1)), !;
+        handlarz(1) -> write('Pomocy wiedźminie! W moim domu uwięziona jest córka! Szafa zablokowała drzwi od środka po uderzeniu głazu w dom sąsiada, który cisnięty został przez katapulty Foltesta.\nNa tyłach domu jest jeszcze jedno wejście, pijani maruderzy próbują się dostać do mojej Hanusi. Pośpiesz się prędko!'), nl, !;
+        handlarz(2), not(posiadasz(hanusia)) -> write('Wiedźminie! Dlaczego pozwoliłeś mojej Hanusi zginąć?!.'), nl, potwory_w_poblizu(handlarz), !;
+        handlarz(2), not(posiadasz(hanusia)) -> write('Wiedźminie! Dlaczego pozwoliłeś mojej Hanusi zginąć?!.'), nl, potwory_w_poblizu(handlarz), !;
+        handlarz(3), posiadasz(hanusia) -> write('Wiedźminie! Dzięki Ci po stokroć! Proszę, słyszałem, że to bezcenny alkohol do warzenia eliksirów. Może Ci się przyda.'), nl, assertz(pomoc(1)), !;
         write('Nic Tu po Tobie! Lepiej się pośpiesz!'), nl.
 
 opis(dom_handlarza)                            :-
-        handlarz(1) -> write('Drzwi do domu są otwarte na ościerz, a ze środka dobiegają krzyki młodej dziewczyny. Jeśli chcesz coś zrobić lepiej zrób to teraz!'), nl, assertz(potwory_lokalizacje(dom_handlarza, maruderzy, 5, hanusia)),retract(handlarz(1)), assertz(handlarz(2)), !;
+        handlarz(1) -> write('Drzwi do domu są otwarte na ościerz, a ze środka dobiegają krzyki młodej dziewczyny. Jeśli chcesz coś zrobić lepiej zrób to teraz!'), nl, !;
         write('Nic Tu po Tobie! Lepiej się pośpiesz!'), nl.
 opis(ogrody)                                   :- write('Woń kwiatów pozwala Ci zapomnieć na chwilę, że miasto znajduje się pod szturmem armi Foltesta. Jedna z kwiatowych rabat pobudza Twój medalion do drgania.\nO ścianę zamku rozbił się płonący pocisk katapult, z odłamków możnaby utworzyć ognisko. A w samej ścianie dostrzegasz szczelinę, którą z pewnością mógłbyś się przecisnąć.'), nl.
-opis(ognisko)                                  :- write('Płomień tańczy wysoko ogrzewając okolicę. Gdyby był tu Vesemir na pewno przypomniałby Ci nie jeden wykład z alchemii.\nMożnaby spróbować wytworzyć jakąś mikstruę, która ułatwiłaby Ci przedostanie się za mury zamku.'), nl.
+opis(ognisko)                                  :- write('Płomień tańczy wysoko ogrzewając okolicę. Gdyby był tu Vesemir na pewno przypomniałby Ci nie jeden wykład z alchemii.\nMożnaby spróbować wytworzyć jakąś miksturę, która ułatwiłaby Ci przedostanie się za mury zamku.'), nl.
 opis(rabatka)                                  :- write('Między ozdobnymi kwiatami dostrzegasz kilka Jaskółczych Ziel.'), nl.
 /* Akt 3 Zamek */
-opis(zamek)                                    :- write('XD.'), nl.
-
+opis(zamek)                                    :- write('Wchodzisz w bezkres sal i korytarzy potężnego zamku. Rozglądasz się w każdą stronę, w poszukiwaniu pokoju Twoich podopiecznych. \nPotrzebujesz informacji na temat miejsca, w którym najcześciej pojawia się Foltest.'), nl.
+opis(pokoj_dzieci)                             :- write('Przekraczając próg, słyszysz głośny chichot dzieci. Rzucają Ci się na szyję, w końcu jesteś ich opiekunką! Twój podstęp działa, jesteś w stanie zdobyć potrzebne informacje.'), nl.
+opis(salon)                                    :- write('Patrzysz w górę, kryształowy żyrandol rozświetla pomieszczenie mogące pomieścić setki gości. \nNa cokole stoi złoty posąg Foltesta. Jesteś jeszcze pewniejszy swojej decyzji.'), nl.
+opis(korytarz)                                 :- write('Od Twoich butów rozlega się głośne echo. Jednak nie masz pojęcia dokąd prowadzi ta ścieżka. \nCzas goni, a w oddali słychać już armię wroga. Znajdź inną drogę.'), nl.
+opis(straznica)                                :- write('Oczy kilkunastu strażników skierowane są na Ciebie od kiedy tylko "przekroczyłaś" próg stażnicy. \nPóki co, wydaje się, że nikt nie wie kim tak naprawdę jesteś. Eliksir działa, ale lepiej trzymaj fason!'), nl.
+opis(balkon)                                   :- write('Panorama miasta maluje się pod Twoimi stopami, a powiew świeżego wiatru muska blizny na Twojej twarzy. \nWydaje Ci się, że to dobre miejsce na zakończenie żywota Twojego celu.'), nl, nl.
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-/* These rules describe how to pick up an object. */
-
+/* Podnoszenie obiektów */
 wez(X) :-
         obecna_lokalizacja(Place),
         przedmioty_lokalizacje(X, Place),
@@ -134,24 +136,9 @@ wez(X) :-
         write(' do ekwipunku.'),
         !, nl.
 
-        %write('Handlarz w ramach wdzięczności za pomoc jego córce wręcza Ci wyśmienity alkohol - Białą Mewę.'),
-        %write('Chowasz Jaskółcze Ziele do ekwipunku.'),
-
-
 wez(_) :-
         write('Nie ma tu już nic do nic do podniesienia.'),
         nl.
-
-uzyj(klucz) :-
-        obecna_lokalizacja(drzwi_prowadzace_na_przedmiescia),
-        posiadasz(klucz),
-        write('Włożyłeś klucz do zamka i z nadzieją spróbowałeś przekręcić go w dziurce. Ku twojemu zaskoczeniu pasował jak ulał!'),
-        nl,
-        write('Wielkie wrota stanęły przed Tobą otworem, wybiegasz na przedmieścia, czując oddech zbliżających się żołnierzy Foltesta na plecach.'),
-        nl,
-        zostaw(klucz),
-        !,
-        idz(przedmiescia).
 
 uzyj(lom) :-
         obecna_lokalizacja(drzwi_prowadzace_na_przedmiescia),
@@ -218,13 +205,16 @@ uzyj(biala_mewa, jaskolcze_ziele, mozg_utopca) :-
         zostaw(biala_mewa),
         zostaw(jaskolcze_ziele),
         zostaw(mozg_utopca),
+        retract(przedmioty_lokalizacje(biala_mewa, ognisko)),
+        retract(przedmioty_lokalizacje(jaskolcze_ziele, ognisko)),
+        retract(przedmioty_lokalizacje(mozg_utopca, ognisko)),
         !.
 
 uzyj(_, _, _) :-
         write('Nie, to nie tak...'),
         nl.
 
-/* These rules describe how to put down an object. */
+/* Upuszczanie posiadanych obiektów */
 zostaw(X) :-
         obecna_lokalizacja(Place),
         posiadasz(X),
@@ -240,18 +230,39 @@ zostaw(_) :-
         write('Nie masz tego przy sobie!'),
         nl.
 
-/* write where you can go from current place. */
+/* Destynacje osiągalne z podanego miejsca */
 destynacje(Place) :-
         write("Dostępne lokacje z "), write(Place), write(":"), nl,
         dostepne_lokacje(Place, X), write(X), nl, fail.
 destynacje(_).
 
-/* This rule tells how to move in a given direction. */
+/* Poruszanie się między lokacjami */
 idz(_) :-
         obecna_lokalizacja(Here),
         potwory_lokalizacje(Here, _, _, _),
         write('No chyba cie pojebalo.'),
         !.
+
+idz(handlarz) :-
+        obecna_lokalizacja(Here),
+        dostepne_lokacje(Here, handlarz),
+        retract(obecna_lokalizacja(Here)),
+        assertz(obecna_lokalizacja(handlarz)),
+        handlarz(0) ->                          retract(handlarz(0)), assertz(handlarz(1)), rozejrzyj_sie, assertz(potwory_lokalizacje(dom_handlarza, maruderzy, 5, hanusia)), !;
+        handlarz(1), not(posiadasz(hanusia)) -> retract(handlarz(1)), assertz(handlarz(2)), assertz(potwory_lokalizacje(handlarz, handlarz, 1, biala_mewa)), rozejrzyj_sie, !;
+        posiadasz(hanusia) ->                   retract(handlarz(1)), assertz(handlarz(3)), assertz(przedmioty_lokalizacje(biala_mewa, handlarz)), rozejrzyj_sie, !;
+        handlarz(3) -> rozejrzyj_sie, !.
+
+idz(dom_handlarza) :-
+        obecna_lokalizacja(Here),
+        dostepne_lokacje(Here, dom_handlarza),
+        retract(obecna_lokalizacja(Here)),
+        assertz(obecna_lokalizacja(dom_handlarza)),
+        handlarz(0) ->  rozejrzyj_sie, !;
+        handlarz(1) ->  rozejrzyj_sie, !;
+        potwory_lokalizacje(dom_handlarza, maruderzy, 5, hanusia) -> retract(potwory_lokalizacje(dom_handlarza, maruderzy, 5, hanusia)), rozejrzyj_sie, !;
+        przedmioty_lokalizacje(hanusia, dom_handlarza) -> retract(przedmioty_lokalizacje(hanusia,dom_handlarza)), rozejrzyj_sie, !;
+        rozejrzyj_sie, !.
 
 idz(Place) :-
         obecna_lokalizacja(Here),
@@ -264,17 +275,24 @@ idz(_) :-
         write('Nie możesz tam pójść z tego miejsca.'),
         fail.
 
-/* This rule lists out what you are posiadasz. */
-trzymasz :-
-        write('Trzymasz:'), nl,
-        trzymasz.
+zastaw_pulapke :-
+        obecna_lokalizacja(zamek) -> porazka, nl, !;
+        obecna_lokalizacja(korytarz) -> handlarz(3) -> zwyciestwo, nl, !;
+        obecna_lokalizacja(korytarz) -> porazka, nl, !;
+        obecna_lokalizacja(balkon) -> zwyciestwo, nl, !;
+        obecna_lokalizacja(salon) -> handlarz(3) -> zwyciestwo, nl, !;
+        obecna_lokalizacja(salon) -> porazka, nl, !;
+        obecna_lokalizacja(straznica) -> porazka, nl, !;
+        obecna_lokalizacja(pokoj_dzieci) -> write('Zabicie ojca na oczach jego własnych dzieci nawet Tobie wydaje się zbyt okrutne...'), nl, !;
+        write('Podana komenda nie jest jeszcze dostępna'), nl, !.
 
+/* Posiadane przedmioty w ekwipunku */
 trzymasz_lista :-
         posiadasz(X),
         write('-'), write(X), nl,
         fail.
 trzymasz_lista.
-/* This rule tells how to look about you. */
+/* Rozglądanie w poszukiwaniu przedmiotów i dostępnych lokacji */
 
 rozejrzyj_sie :-
         nl,
@@ -288,8 +306,7 @@ rozejrzyj_sie :-
         nl.
 
 
-/* These rules set up a loop to mention all the objects
-   in your vicinity. */
+/* Lista przedmiotów znajdujących się w danej lokacji */
 
 przedmioty_w_poblizu(Place) :-
         przedmioty_lokalizacje(X, Place),
@@ -297,12 +314,14 @@ przedmioty_w_poblizu(Place) :-
 
 przedmioty_w_poblizu(_).
 
+/* Lista potworów znajdujących się w danej lokacji */
 potwory_w_poblizu(Place) :-
         potwory_lokalizacje(Place, X, _, _),
         write('Twoim przeciwnikiem jest: '), write(X), write('.'), nl, fail.
 
 potwory_w_poblizu(_).
 
+/* Walka z przeciwnikami */
 atakuj :-
         obecna_lokalizacja(Place),
         potwory_lokalizacje(Place, X, Y, _),
@@ -322,16 +341,17 @@ wynik_walki(Z, Y, X, Place) :-
         retract(potwory_lokalizacje(Place, _, _, Item)),
         assertz(przedmioty_lokalizacje(Item, Place)),
         nl,
-        przedmioty_w_poblizu(Place).
+        przedmioty_w_poblizu(Place), !.
 
-wynik_walki(Z, Y, X) :-
+wynik_walki(Z, Y, X, _) :-
         Z =< Y,
         write('Przegrałeś walkę z: '),
         write(X),
-        write('!'),
-        nl.
+        write('!\n'),
+        porazka,
+        halt.
 
-/* This rule just writes out game instructions. */
+/* Komendy dostępne w grze */
 komendy :-
         nl,
         write('Komendy wpisuj przy użyciu standardowej składni Prologa.'), nl,
@@ -347,39 +367,44 @@ komendy :-
         write('r[ozejrzyj_sie].     -- aby rozejrzeć się dookoła.'), nl,
         write('d[estynacje].        -- aby zobaczyć, gdzie możesz się dostać z miejsca, w którym jesteś.'), nl,
         write('k[omendy].           -- aby ponownie zobaczyć listę dostępnych komend.'), nl,
+        write('z[astaw_pulapke].    -- aby zastawić pułapke (dostępne tylko w zamku).'), nl,
         write('halt.                -- aby zakończyć grę i z niej wyjść.'), nl,
         nl.
 
-%%%%% Shortcuts %%%%%
+%%%%% Skróty polecen %%%%%
 i(Place)  :- idz(Place).
 w(Object) :- wez(Object).
 z(Object) :- zostaw(Object).
 u(Object) :- uzyj(Object).
-t         :- trzymasz.
+u(Object1, Object2, Object3) :- uzyj(Object1, Object2, Object3).
+t         :- trzymasz_lista.
 r         :- rozejrzyj_sie.
 d         :- destynacje.
 k         :- komendy.
 a         :- atakuj.
+z         :- zastaw_pulapke.
 %%%%%%%%%%%%%%%%%%%%%
 
 
-/* This rule prints out instructions and tells where you are. */
+/* Komenda startująca gre */
 
 start :-
         komendy,
         write('Nareszcie dotarłeś do przedmieści Remisu, gdzie masz nadzieję zgładzić tyrana Foltesta.'),
         nl,
-        write('Niestety podróż zajęła dłużej niż oczekiwałeś, a wymarsz armii króla nastąpi za około 25minut.'),
+        write('Niestety podróż zajęła dłużej niż oczekiwałeś, a wymarsz armii króla nastąpi za około 25 minut.'),
         nl,
         write('Wykorzystaj ten czas mądrze i przygotuj się najlepiej jak potrafisz. Jesteś wiedźminem, sam powinieneś wiedzieć najlepiej czego Ci potrzeba!'),
         nl,
         rozejrzyj_sie.
+/* Informacja o porażce */
 
 porazka :-
-        write('Niestety Twoja misja zakończyła się klęską.'),
+        write('Niestety Twoja misja zakończyła się klęską.\n'),
         nl,
         halt.
 
+/* Informacja o zwycięstwie */
 zwyciestwo :-
         write('Gratulacje, Foltest nie żyje, a Ty liczysz browary, które możesz kupić za pieniądze z nagrody.'),
         nl,
