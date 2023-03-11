@@ -240,7 +240,7 @@ destynacje(_).
 idz(_) :-
         obecna_lokalizacja(Here),
         potwory_lokalizacje(Here, _, _, _),
-        write('No chyba cie pojebalo.'),
+        write('Próbujesz opuścić tę lokalizację, ale potwór Ci to uniemożliwia. Musisz go zgładzić!'),
         !.
 
 idz(handlarz) :-
