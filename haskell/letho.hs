@@ -346,7 +346,7 @@ stateManager (State s a i variables) = do
 
 gameLoop :: IO ()
 gameLoop = do
-    let initState = State przedmiescia loc_list [] vars
+    let initState = State brzeg_rzeki loc_list [] vars
     putStrLn (describeLocation (location initState))
     stateManager initState
     
