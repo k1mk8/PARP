@@ -15,29 +15,14 @@ data State = State {location :: Location, all_locations :: [Location], inventory
 
 data GameVar = GameVar {var_name :: String, var_value :: Int} deriving (Eq, Show)
 
-introductionText = [
-    "Nareszcie dotarłeś do przedmieści Remisu, gdzie masz nadzieję zgładzić tyrana Foltesta." ,
-    "Niestety podróż zajęła dłużej niż oczekiwałeś, a wymarsz armii króla nastąpi za około 25 minut."   , 
-    "Wykorzystaj ten czas mądrze i przygotuj się najlepiej jak potrafisz. Jesteś wiedźminem, sam powinieneś wiedzieć najlepiej czego Ci potrzeba!"
-    ]
+win_state = GameVar "win" 0
+trader_flag = GameVar "handlarz" 0
+visits_flag = GameVar "odwiedzenia" 0
 
-instructionsText = [
-    "Dostępne komendy:",
-    "",
-        "i[dz](Miejsce)       -- aby pójść do tego miejsca",
-        "w[ez](obiekt).       -- aby podnieść ten obiekt",
-        "u[zyj](obiekt).      -- aby użyć tego obiektu",
-        "z[ostaw](obiekt).    -- aby odłożyć ten obiekt",
-        "e[kwipunek].         -- aby wypisać przedmioty, które się trzymasz",
-        "r[ozejrzyj_sie].     -- aby rozejrzeć się dookoła",
-        "k[omendy].           -- aby ponownie zobaczyć listę dostępnych komend",
-        "z[astaw_pulapke].    -- aby zastawić pułapke (dostępne tylko w zamku)",
-        "halt.                -- aby zakończyć grę i z niej wyjść."
-    ]
+vars = [win_state, trader_flag, visits_flag]
+--
 
--- data types
-
-
+-- Lokacje
 brzeg_rzeki = Location "brzeg_rzeki" ["kanaly","szopa","lodka"] [] []
 szopa = Location "szopa" ["brzeg_rzeki","skrzynia","stol_rzemieslniczy"] [] []
 skrzynia = Location "skrzynia" ["szopa"] ["klucz"] []
@@ -63,6 +48,28 @@ korytarz = Location "korytarz" ["zamek"] [] []
 straznica = Location "straznica" ["zamek"] [] []
 
 loc_list = [brzeg_rzeki, szopa, skrzynia, stol_rzemieslniczy, kanaly, miejsce_mocy, drzwi_prowadzace_na_przedmiescia, przedmiescia, handlarz, dom_handlarza, ogrody, rabatka, ognisko, zamek, balkon, pokoj_dzieci, salon, korytarz, straznica]
+--
+
+-- Opisy
+introductionText = [
+    "Nareszcie dotarłeś do przedmieści Remisu, gdzie masz nadzieję zgładzić tyrana Foltesta." ,
+    "Niestety podróż zajęła dłużej niż oczekiwałeś, a wymarsz armii króla nastąpi za około 25 minut."   , 
+    "Wykorzystaj ten czas mądrze i przygotuj się najlepiej jak potrafisz. Jesteś wiedźminem, sam powinieneś wiedzieć najlepiej czego Ci potrzeba!"
+    ]
+
+instructionsText = [
+    "Dostępne komendy:",
+    "",
+        "i[dz](Miejsce)       -- aby pójść do tego miejsca",
+        "w[ez](obiekt).       -- aby podnieść ten obiekt",
+        "u[zyj](obiekt).      -- aby użyć tego obiektu",
+        "z[ostaw](obiekt).    -- aby odłożyć ten obiekt",
+        "e[kwipunek].         -- aby wypisać przedmioty, które się trzymasz",
+        "r[ozejrzyj_sie].     -- aby rozejrzeć się dookoła",
+        "k[omendy].           -- aby ponownie zobaczyć listę dostępnych komend",
+        "z[astaw_pulapke].    -- aby zastawić pułapke (dostępne tylko w zamku)",
+        "halt.                -- aby zakończyć grę i z niej wyjść."
+    ]
 
 
 describeLocation :: Location -> String
@@ -99,12 +106,9 @@ describeLocation l = (base_desc ++ "\n" ++ item_desc ++ "\n" ++ conn_desc ++ mon
         conn_desc = if (length (connections l)) == 0 then "Nie mozesz stad isc do innego miejsca. Wyglada na to, ze tu utknales\n" else "Z tego miejsca mozesz isc do:\n" ++ numberedList (connections l)
         mons_desc = if (length (monsters l)) == 0 then "Nie ma tutaj przeciwnika\n" else "Twoim przeciwnikiem jest: \n" ++ numberedList (map fst (monsters l)) ++ "\nWpisz \"a\", żeby zaatakować przeciwnika \n"
 
+--
 
-checkFlag :: State -> String -> Bool
-checkFlag state n = var_value (getVariable state n) /= 0
-
-
-
+-- Logika gry
 insertValueIntoVariables :: [GameVar] -> String -> Int -> [GameVar]
 insertValueIntoVariables gv v nv =
     insertValueIntoVariablesLoop gv v nv []
@@ -134,7 +138,7 @@ numberedList' i (l:ls) = (numberedList' i [l]) ++ (numberedList' (i+1) ls)
 
 
 numberedList :: [String] -> String
-numberedList = numberedList' 1 -- point free style!!
+numberedList = numberedList' 1
 
 
 getLocationFromString :: String -> [Location] -> Location
@@ -143,7 +147,7 @@ getLocationFromString s (l:ls) |  loc_name l == s = l
                                | otherwise = getLocationFromString s ls
 
 
-getElementAtIndex :: [a] -> String -> Maybe a -- returns from [a] if valid index (1-indexed)
+getElementAtIndex :: [a] -> String -> Maybe a
 getElementAtIndex lst indexString = do
     let index = readMaybe indexString  :: Maybe Int
     let element = case index of
@@ -154,22 +158,19 @@ getElementAtIndex lst indexString = do
     element
 
 
-descLoop []     fs = fs ++ "\n"
-descLoop (l:ls) s = descLoop ls (s ++ " " ++ l)
-
-
 printMessage :: State -> String -> IO State
 printMessage state m = do
     putStr m
     return state
 
 
--- print strings from list in separate lines
 printLines :: [String] -> IO ()
 printLines xs = putStr (unlines xs)
 
+
 printIntroduction = printLines introductionText
 printInstructions = printLines instructionsText
+
 
 readCommand :: IO String
 readCommand = do
@@ -177,13 +178,6 @@ readCommand = do
     hFlush stdout
     xs <- getLine
     return xs
-
--- starting state and vars
-win_state = GameVar "win" 0
-trader_flag = GameVar "handlarz" 0
-visits_flag = GameVar "odwiedzenia" 0
-
-vars = [win_state, trader_flag, visits_flag]
 
 
 canGoTo :: Location -> Location -> Bool
@@ -217,16 +211,13 @@ takeItem (State l al inventory v) item = do
     if length monsters > 0 
         then printMessage (State l al inventory v) "Zanim podniesiesz przedmiot musisz pokonać swojego przeciwnika!!!\n"
     else if elem item (item_list l)
-        then printMessage (State (removeItemFromLoc l) (removeItemFromLocList al []) (item:inventory) v) (if item /= "hanusia" then "Udało Ci się podnieść przedmiot\n" else "Hanusia idzie z Tobą!\n")
+        then printMessage (State (removeItemFromLoc l) ((removeItemFromLoc l):(removeItemFromLocList al l)) (item:inventory) v) (if item /= "hanusia" then "Udało Ci się podnieść przedmiot\n" else "Hanusia idzie z Tobą!\n")
         else if indexElement /= "" 
             then takeItem (State l al inventory v) indexElement
             else printMessage (State l al inventory v) "Nie możesz podnieść tego przedmiotu, bo tu go nie ma.\n"
     where
         removeItemFromLoc (Location name conns items monsters) = Location name conns [i | i <- items, i /= item] monsters
-        removeItemFromLocList [] locs = locs
-        removeItemFromLocList (loc : xloc) locs
-            | loc == l = locs ++ [(removeItemFromLoc loc)] ++ xloc
-            | otherwise = removeItemFromLocList xloc (locs ++ [loc])
+        removeItemFromLocList al l = [i | i <- al, i /= l]
         indexElement = case getElementAtIndex (item_list l) item of
                             Just a -> a
                             Nothing -> ""
@@ -298,7 +289,6 @@ halt (State l al i v) gameresult = return (State l al i newv)
         newv = insertValueIntoVariables v "win" (gameresult)
 
 
-
 execCommand :: Command -> State -> IO State
 execCommand cmd gameState = do
     case (com_name cmd) of
@@ -347,10 +337,9 @@ finishGame state = do
 
 stateManager :: State -> IO ()
 stateManager (State s a i variables) = do
-    let newv = insertValueIntoVariables variables "beer_flag" (1)
     raw_cmd <- readCommand
     let cmd = createCommand raw_cmd
-    newState <- execCommand cmd (State s a i newv)
+    newState <- execCommand cmd (State s a i variables)
     finishFlag <- finishGame newState
     if finishFlag == False then stateManager newState else putStrLn "\nKoniec gry"
 
